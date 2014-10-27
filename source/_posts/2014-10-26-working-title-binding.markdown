@@ -1,0 +1,27 @@
+---
+layout: post
+title: These Ties That Bind
+date: 2014-10-22 23:55:12 -0400
+comments: true
+categories: 
+---
+
+When we were first learning to debug our code, we budding young Rubyists were given a great tool: Pry. This gem serves both as a console (comparable or perhaps superior to IRB), and as a user-friendly, rather intuitive debugger. All you must do to use it is require the gem, and type `binding.pry` into the line or lines of your program where you'd like to stop and look around. Or, put <a href="http://pryrepl.org/">more technically</a>, Pry allows you to explore the run-time view of a program by making all program state at that point available.
+
+Cool, right? Right! This is exactly what I as a newcomer to the craft want to be able to do: drop into my program in the middle of its execution, and figure out what it is doing by asking it about the values of variables, etc. After learning about bindings, which I assumed to be the the brainchild of the makers of Pry, I felt overwhelming gratitude toward them...and then continued working on some lab or other, I'm sure.
+
+More recently, we began building our first web applications, and concurrently learned about ERB, or Embedded Ruby. ERB is a form of magic that allows you to (SURPRISE!) embed Ruby in the HTML with which you render your web pages. All you need are a couple of special delimiting characters (<%=, <%, and %>) to allow lines of your otherwise HTML-looking template to come alive with lines of Ruby code when your program is executed. Again, very cool. But then, the question was posed to us in lecture, how can we make the result of an ERB template aware of all current values and the present scope of the program at the moment that we want it to render our page? Much to my surprise, the answer was binding.
+
+So clearly binding was not just a Pry thing. But in the whirlwind of lecture, I made another (faulty) assumption: that binding was a Ruby thing. But once the intellectual dust settled and I was hunkered down with lunch, I got to wondering: what is a binding anyway? How was pry able to leverage (ha) its existence to build an intelligent debugging tool? Didn't non-Rubyists want something this useful? And then, the (now-frightfully obvious kicker): Do all languages have this? 
+
+As far as I can tell from my research thus far, yes: bindings are everywhere. <a href="http://en.wikipedia.org/wiki/Name_binding/">Name binding</a>, as the broader practice is referred to, is simply the association of properties with names at a particular moment in time. By referencing the scope of the program at the moment in which name-binding occurs, the binding object accurately establishes associations between the named locations in program code, which vary lexcially, and the possible execution paths of objects, which vary temporally. (At least, I think that's how it <a href="http://en.wikipedia.org/wiki/Name_binding">boils down.</a>)
+
+I dug a little further into Ruby's specific implementation of bindings and found something interesting. Given that Ruby is an adamantly object-oriented language, it was not surprising to confirm my suspicion that  bindings are indeed objects -- of the `Binding` class, to boot. What I did find intriguing though was the close relationship between bindings and the method by which they can be set: the `Kernel#binding` method.
+
+Kernel is a term that I'd heard tossed around in the context of operating systems, but had yet to encounter conceptually in my code. In Ruby, `Kernel` is a module deep in the heart of the language. It is included by class `Object`, thereby making all its methods available in every Ruby object. When the method `binding` is called -- which is done without a receiver, in functional form-- it returns a binding object that is aware of established values and scope.
+
+Okay. So a few atypical things seem to be happening here: namely, that you can call a method without a receiver, and that Ruby documentation itself admits that this is a functional (versus object-oriented) use of a method. I'm not totally comfortable unpacking all the implications of this yet, but I can say this: back when Ruby, and perhaps even programming in general, was born, someone (or a collection of someones) decided it was a vitally good idea to allow a program to introspect, and to do so intelligently, in context, just as we humans tend to do all the time in our own use of language.
+
+Now this isn't the biggest revelation I've ever had while learning to code, and in fact, may not even rank in the top 20 in terms of its day-to-day usefulness to me. But I wanted to write about this because of what I think it shows us about programming in general, and because this is something I want to keep in mind while I am a beginner in this craft, and probably long after.
+
+Though programming is a practice that ultimately results in machines performing certain, defined tasks in certain, defined ways that meet expectation and fend off exception, it is also a uniquely human practice. After all, in my preceding sentence, who is defining the tasks, the ways, the expectations, and the exceptions? It makes a weird and comforting sort of sense that deep down in the code we build, some of the first programmers who authored these languages realized the utility of giving the program the ability to do something that we (or at least I) want desperately on a daily basis: for the program to know how to take stock of the present moment, and to be able to communicate its self to you. 
