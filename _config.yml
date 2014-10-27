@@ -3,11 +3,11 @@
 # ----------------------- #
 
 url: http://yoursite.com
-title: My Octopress Blog
-subtitle: A blogging framework for hackers.
-author: Your Name
+title: Always the Programmer, Never the Program
+subtitle: The quest to think like a machine while remaining mostly human
+author: Chelsea Guster
 simple_search: https://www.google.com/search
-description:
+description: blogging about code while attending The Flatiron School
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in
