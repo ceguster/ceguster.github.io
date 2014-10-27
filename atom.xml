@@ -1,93 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
 
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <title>Always the Programmer, Never the Program</title>
-  <meta name="author" content="Chelsea Guster">
-
-  
-  <meta name="description" content="This week, I discovered a couple of things about regular expressions, or regexes, that reminded me of some bigger themes and lessons in programming. &hellip;">
-  
-
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  
-  <link rel="canonical" href="http://ceguster.github.io">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="Always the Programmer, Never the Program" type="application/atom+xml">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
-  
-
-</head>
-
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">Always the Programmer, Never the Program</a></h1>
-  
-    <h2>The quest to think like a machine while remaining mostly human</h2>
-  
-</hgroup>
-
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="https://www.google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:ceguster.github.io" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-</ul>
-
-</nav>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
-  
-  
-  
-    <article>
-      
-  <header>
+  <title><![CDATA[Always the Programmer, Never the Program]]></title>
+  <link href="http://ceguster.github.io/atom.xml" rel="self"/>
+  <link href="http://ceguster.github.io/"/>
+  <updated>2014-10-26T21:59:12-04:00</updated>
+  <id>http://ceguster.github.io/</id>
+  <author>
+    <name><![CDATA[Chelsea Guster]]></name>
     
-      <h1 class="entry-title"><a href="/blog/2014/10/09/blog-1/">Regex, the Great & Powerful</a></h1>
-    
-    
-      <p class="meta">
-        
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
 
-
-
-
-<time class='entry-date' datetime='2014-10-09T19:29:29-04:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>7:29 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This week, I discovered a couple of things about regular expressions, or regexes, that reminded me of some bigger themes and lessons in programming.</p>
+  
+  <entry>
+    <title type="html"><![CDATA[Regex, the Great & Powerful]]></title>
+    <link href="http://ceguster.github.io/blog/2014/10/09/blog-1/"/>
+    <updated>2014-10-09T19:29:29-04:00</updated>
+    <id>http://ceguster.github.io/blog/2014/10/09/blog-1</id>
+    <content type="html"><![CDATA[<p>This week, I discovered a couple of things about regular expressions, or regexes, that reminded me of some bigger themes and lessons in programming.</p>
 
 <p><strong>First, it is possible to have glorious moments of mind-meld with your machine when what you mean, what you type, and what the computer understands are all the same.</strong> I encountered a moment of regex understanding like this with a lab entitled Phone Number Formatter, which asked us to take in any 10-digit string and produce a nicely formatted telephone number, such as (123) 456-7890. Looking at the test spec for the lab, I saw I needed to allow for the given number to be presented in a variety of ways, ranging from unformatted, with no spaces or punctuation, to partially formatted, with one dash or parentheses around the leading 3 digits. Given this variation, I chose first to normalize the argument I would be given, by globally substituting in nil for any spaces or punctuation already in the number.</p>
 
@@ -129,68 +60,7 @@
 <p>Read in plain English, this says something like, &ldquo;Find the strings that start with any word characters except @ and whitespace, followed by one @, followed by any word characters except @ and whitespace, but including one period, followed by any word characters except @ and whitespace, at which point, the string will end.&rdquo; (In this instance, I find the regex to be the somewhat more eloquent means of communicating intent). This expression allowed the test to pass, and reminded me not to overthink things; if you what you don&rsquo;t want to find, build against that, and not for all other possibilities.</p>
 
 <p>With that concludes my brief salute to the Regular Expression, which I&rsquo;ve started to see as a microcosm of the programming universe unto itself. Thanks for reminding me of things I should know.</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
-<aside class="sidebar">
-  
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2014/10/09/blog-1/">Regex, the Great & Powerful</a>
-      </li>
-    
-  </ul>
-</section>
-
-
-
-
-
-  
-</aside>
-
-    </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Chelsea Guster -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
-</footer>
-  
-
-
-
-
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = '//platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
-
-</body>
-</html>
+</feed>
