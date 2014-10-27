@@ -1,0 +1,43 @@
+---
+layout: post
+title: "Regex, The Great & Powerful"
+date: 2014-10-09 19:29:29 -0400
+comments: true
+categories: 
+---
+
+This week, I discovered a couple of things about regular expressions, or regexes, that reminded me of some bigger themes and lessons in programming. 
+
+<strong>First, it is possible to have glorious moments of mind-meld with your machine when what you mean, what you type, and what the computer understands are all the same.</strong> I encountered a moment of regex understanding like this with a lab entitled Phone Number Formatter, which asked us to take in any 10-digit string and produce a nicely formatted telephone number, such as (123) 456-7890. Looking at the test spec for the lab, I saw I needed to allow for the given number to be presented in a variety of ways, ranging from unformatted, with no spaces or punctuation, to partially formatted, with one dash or parentheses around the leading 3 digits. Given this variation, I chose first to normalize the argument I would be given, by globally substituting in nil for any spaces or punctuation already in the number. 
+
+``` ruby normalize_phone_number.rb
+def normalize_phone_number(num)
+  reg_num = num.to_s.gsub(/[\s()-]/, "")
+```
+Secondly, I want to standardize the output of the method, by placing parentheses around the first 3 digits, followed by a space, followed by 3 more, then a dash, then the final four. Shockingly, I found that regex can think this way too, by using what is known as <a href = "http://www.ruby-doc.org/core-2.1.3/Regexp.html">capturing</a>, or creating distinct groups within the larger regular expression that can be referred back to by their group name or number (but not both). 
+
+``` ruby normalize_phone_number.rb
+def normalize_phone_number(num)
+  reg_num = num.to_s.gsub(/[\s()-])/, "")
+  tel_num = reg_num.to_s.sub /(\d{3})(\d{3})(\d{4})/, '(\1) \2-\3'
+  tel_num
+end
+```
+This construct allowed me to do something in my code that feels very linguistically natural in English: I could say "the first 3 numbers", "the next 3 numbers", and "the next 4 numbers" to a computer and be understood. Awesome.
+
+<strong>Another lesson in programming that regexes reminded me of is: don't over-program.</strong> I was reminded of this during a lab entitled "Regex Rally," in which we had to write the correct regular expression directly into the spec file to make the tests pass. By looking at the third test, which was asking for a regex that matches a valid email address. Working with <a href="http://www.rubular.com">Rubular</a>, I built an expression that matched standard email addresses (name@domain.***), but ran into trouble with emails where the @ was preceded by a string that contained periods, or where the domain was, for example, "@co.uk," instead of ".com." I found an expression that allowed those variations...but it failed to weed out unacceptable inputs, like "name@example.com@example.com." 
+
+I worked on Rubular for a little while, but was having trouble weeding out all the edge cases (and beginning to feel a little crazy). Then I realized -- I was writing a regular expression to allow certain characters in a certain relational order, but what I really needed was a regex that <em>disallowed</em> the undesirables. I came up with the following.
+
+``` ruby regex_rally_spec.rb
+it "matches valid email address" do
+    my_regex = /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/
+```
+
+Read in plain English, this says something like, "Find the strings that start with any word characters except @ and whitespace, followed by one @, followed by any word characters except @ and whitespace, but including one period, followed by any word characters except @ and whitespace, at which point, the string will end." (In this instance, I find the regex to be the somewhat more eloquent means of communicating intent). This expression allowed the test to pass, and reminded me not to overthink things; if you what you don't want to find, build against that, and not for all other possibilities. 
+
+
+With that concludes my brief salute to the Regular Expression, which I've started to see as a microcosm of the programming universe unto itself. Thanks for reminding me of things I should know. 
+
+
+
