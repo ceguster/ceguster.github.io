@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Always the Programmer, Never the Program</title>
+  <title>These Ties That Bind - Always the Programmer, Never the Program</title>
   <meta name="author" content="Chelsea Guster">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ceguster.github.io">
+  <link rel="canonical" href="http://ceguster.github.io/blog/2014/10/22/working-title-binding">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Always the Programmer, Never the Program" type="application/atom+xml">
@@ -63,15 +63,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/10/22/working-title-binding/">These Ties That Bind</a></h1>
+      <h1 class="entry-title">These Ties That Bind</h1>
     
     
       <p class="meta">
@@ -87,7 +84,7 @@
   </header>
 
 
-  <div class="entry-content"><p>When we were first learning to debug our code, we budding young Rubyists were given a great tool: Pry. This gem serves both as a console (comparable or perhaps superior to IRB), and as a user-friendly, rather intuitive debugger. All you must do to use it is require the gem, and type <code>binding.pry</code> into the line or lines of your program where you&rsquo;d like to stop and look around. Or, put <a href="http://pryrepl.org/">more technically</a>, Pry allows you to explore the run-time view of a program by making all program state at that point available.</p>
+<div class="entry-content"><p>When we were first learning to debug our code, we budding young Rubyists were given a great tool: Pry. This gem serves both as a console (comparable or perhaps superior to IRB), and as a user-friendly, rather intuitive debugger. All you must do to use it is require the gem, and type <code>binding.pry</code> into the line or lines of your program where you&rsquo;d like to stop and look around. Or, put <a href="http://pryrepl.org/">more technically</a>, Pry allows you to explore the run-time view of a program by making all program state at that point available.</p>
 
 <p>Cool, right? Right! This is exactly what I as a newcomer to the craft want to be able to do: drop into my program in the middle of its execution, and figure out what it is doing by asking it about the values of variables, etc. After learning about bindings, which I assumed to be the the brainchild of the makers of Pry, I felt overwhelming gratitude toward them&hellip;and then continued working on some lab or other, I&rsquo;m sure.</p>
 
@@ -107,88 +104,46 @@
 
 <p>Though programming is a practice that ultimately results in machines performing certain, defined tasks in certain, defined ways that meet expectation and fend off exception, it is also a uniquely human practice. After all, in my preceding sentence, who is defining the tasks, the ways, the expectations, and the exceptions? It makes a weird and comforting sort of sense that deep down in the code we build, some of the first programmers who authored these languages realized the utility of giving the program the ability to do something that we (or at least I) want desperately on a daily basis: for the program to know how to take stock of the present moment, and to be able to communicate its self to you.</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Chelsea Guster</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2014-10-22T23:55:12-04:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2014</span></span> <span class='time'>11:55 pm</span></time>
+      
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2014/10/09/blog-1/">Regex, the Great & Powerful</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-10-09T19:29:29-04:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>7:29 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This week, I discovered a couple of things about regular expressions, or regexes, that reminded me of some bigger themes and lessons in programming.</p>
-
-<p><strong>First, it is possible to have glorious moments of mind-meld with your machine when what you mean, what you type, and what the computer understands are all the same.</strong> I encountered a moment of regex understanding like this with a lab entitled Phone Number Formatter, which asked us to take in any 10-digit string and produce a nicely formatted telephone number, such as (123) 456-7890. Looking at the test spec for the lab, I saw I needed to allow for the given number to be presented in a variety of ways, ranging from unformatted, with no spaces or punctuation, to partially formatted, with one dash or parentheses around the leading 3 digits. Given this variation, I chose first to normalize the argument I would be given, by globally substituting in nil for any spaces or punctuation already in the number.</p>
-
-<figure class='code'><figcaption><span>normalize_phone_number.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">normalize_phone_number</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">reg_num</span> <span class="o">=</span> <span class="n">num</span><span class="o">.</span><span class="n">to_s</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="sr">/[\s()-]/</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Secondly, I want to standardize the output of the method, by placing parentheses around the first 3 digits, followed by a space, followed by 3 more, then a dash, then the final four. Shockingly, I found that regex can think this way too, by using what is known as <a href = "http://www.ruby-doc.org/core-2.1.3/Regexp.html">capturing</a>, or creating distinct groups within the larger regular expression that can be referred back to by their group name or number (but not both).</p>
-
-<figure class='code'><figcaption><span>normalize_phone_number.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">normalize_phone_number</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">reg_num</span> <span class="o">=</span> <span class="n">num</span><span class="o">.</span><span class="n">to_s</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="sr">/[\s()-])/</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">tel_num</span> <span class="o">=</span> <span class="n">reg_num</span><span class="o">.</span><span class="n">to_s</span><span class="o">.</span><span class="n">sub</span> <span class="sr">/(\d{3})(\d{3})(\d{4})/</span><span class="p">,</span> <span class="s1">&#39;(\1) \2-\3&#39;</span>
-</span><span class='line'>  <span class="n">tel_num</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This construct allowed me to do something in my code that feels very linguistically natural in English: I could say &ldquo;the first 3 numbers&rdquo;, &ldquo;the next 3 numbers&rdquo;, and &ldquo;the next 4 numbers&rdquo; to a computer and be understood. Awesome.</p>
-
-<p><strong>Another lesson in programming that regexes reminded me of is: don&rsquo;t over-program.</strong> I was reminded of this during a lab entitled &ldquo;Regex Rally,&rdquo; in which we had to write the correct regular expression directly into the spec file to make the tests pass. By looking at the third test, which was asking for a regex that matches a valid email address. Working with <a href="http://www.rubular.com">Rubular</a>, I built an expression that matched standard email addresses (name@domain.***), but ran into trouble with emails where the @ was preceded by a string that contained periods, or where the domain was, for example, &ldquo;@co.uk,&rdquo; instead of &ldquo;.com.&rdquo; I found an expression that allowed those variations&hellip;but it failed to weed out unacceptable inputs, like &ldquo;name@<a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#x65;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#x2e;&#x63;&#x6f;&#109;&#64;&#101;&#120;&#97;&#x6d;&#112;&#x6c;&#101;&#46;&#99;&#111;&#109;&#x2e;">&#x65;&#x78;&#x61;&#x6d;&#112;&#108;&#101;&#46;&#99;&#111;&#109;&#x40;&#x65;&#120;&#97;&#109;&#x70;&#108;&#101;&#x2e;&#x63;&#111;&#x6d;&#x2e;</a>&rdquo;</p>
-
-<p>I worked on Rubular for a little while, but was having trouble weeding out all the edge cases (and beginning to feel a little crazy). Then I realized &ndash; I was writing a regular expression to allow certain characters in a certain relational order, but what I really needed was a regex that <em>disallowed</em> the undesirables. I came up with the following.</p>
-
-<figure class='code'><figcaption><span>regex_rally_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">it</span> <span class="s2">&quot;matches valid email address&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">my_regex</span> <span class="o">=</span> <span class="sr">/\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Read in plain English, this says something like, &ldquo;Find the strings that start with any word characters except @ and whitespace, followed by one @, followed by any word characters except @ and whitespace, but including one period, followed by any word characters except @ and whitespace, at which point, the string will end.&rdquo; (In this instance, I find the regex to be the somewhat more eloquent means of communicating intent). This expression allowed the test to pass, and reminded me not to overthink things; if you what you don&rsquo;t want to find, build against that, and not for all other possibilities.</p>
-
-<p>With that concludes my brief salute to the Regular Expression, which I&rsquo;ve started to see as a microcosm of the programming universe unto itself. Thanks for reminding me of things I should know.</p>
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://ceguster.github.io/blog/2014/10/22/working-title-binding/" data-via="" data-counturl="http://ceguster.github.io/blog/2014/10/22/working-title-binding/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/10/09/blog-1/" title="Previous Post: Regex, The Great & Powerful">&laquo; Regex, The Great & Powerful</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -212,6 +167,7 @@
 
   
 </aside>
+
 
     </div>
   </div>
