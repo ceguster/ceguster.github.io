@@ -4,7 +4,7 @@
   <title><![CDATA[Always the Programmer, Never the Program]]></title>
   <link href="http://ceguster.github.io/atom.xml" rel="self"/>
   <link href="http://ceguster.github.io/"/>
-  <updated>2014-10-27T09:15:46-04:00</updated>
+  <updated>2014-11-07T09:46:10-05:00</updated>
   <id>http://ceguster.github.io/</id>
   <author>
     <name><![CDATA[Chelsea Guster]]></name>
@@ -14,10 +14,254 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Sourcery and Aliased Associations in ActiveRecord]]></title>
+    <link href="http://ceguster.github.io/blog/2014/11/02/whats-that-source/"/>
+    <updated>2014-11-02T16:19:16-05:00</updated>
+    <id>http://ceguster.github.io/blog/2014/11/02/whats-that-source</id>
+    <content type="html"><![CDATA[<p>This one time, at the Flatiron School, I wrote a program that passed all the tests and I had <strong>no</strong> idea how it worked! This is the story of how I whiteboarded my way to clarity.</p>
+
+<p>The problem was such: while working on a lab that had us build a rough version of an Airbnb-like application, I had to enable my User model to behave as both a host and a guest. Cool&hellip;.wait, what? I found lots of confusing material about polymorphism and some slightly less perplexing material about single table inheritance, but found clarity only after a very helpful talk with Amanda, one of our TAs. From her I learned that I could use <code>:class_name</code> in my ActiveRecord associations to expose certain relationships to a user in the specific context of host or guest. Let&rsquo;s see it in action.</p>
+
+<figure class='code'><figcaption><span>listing.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Listing</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>  <span class="n">belongs_to</span> <span class="ss">:neighborhood</span>
+</span><span class='line'>  <span class="n">belongs_to</span> <span class="ss">:host</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;User&quot;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reservations</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reviews</span><span class="p">,</span> <span class="ss">:through</span> <span class="o">=&gt;</span> <span class="ss">:reservations</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:guests</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="ss">:through</span> <span class="o">=&gt;</span> <span class="ss">:reservations</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here we&rsquo;ve got all of the associations in the Listing model. The first example of the thing that I think is called <strong>&ldquo;aliasing&rdquo;</strong> (at least, that&rsquo;s what I&rsquo;m going to call it, so get cozy with the term) is on line 3. Basically, we know that we want listing to belong_to a user, and also that in having a listing, that user becomes a host. We can write as much, and declare that listing <code>belongs_to :host</code>, which is all well and good. But at that point, the computer will get a little lost, as there is no host model. We resolve its confusion by telling it which class to regard as &ldquo;host&rdquo; in this association. And thus, from necessity, <code>:class_name =&gt;"User"</code> is born.</p>
+
+<p>Pretty cool, huh? YEAH. Let&rsquo;s take another look.</p>
+
+<figure class='code'><figcaption><span>listing.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Listing</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>  <span class="n">belongs_to</span> <span class="ss">:neighborhood</span>
+</span><span class='line'>  <span class="n">belongs_to</span> <span class="ss">:host</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;User&quot;</span>  <span class="c1"># AR gives us &#39;listing.host&#39; method</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reservations</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reviews</span><span class="p">,</span> <span class="ss">:through</span> <span class="o">=&gt;</span> <span class="ss">:reservations</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:guests</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="ss">:through</span> <span class="o">=&gt;</span> <span class="ss">:reservations</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>On line 6, we have another example of aliasing, this time with a slightly more complex <code>has_many/through</code> relationship. Here, we want to enable a listing to know about its guests &ndash; more specifically, we want it to know that &lsquo;guests&rsquo; are really just users who have stayed at that listing by having had a reservation there.</p>
+
+<p>We&rsquo;ll start as we did before, by just stating the association we want to exist: a listing <code>has_many :guests</code>. Just as before, the computer will not know what on earth you&rsquo;re talking about, but you can reassure it with a simple <code>:class_name =&gt; "User"</code> to let it know that guests are just Users in a particular context. What context, your machine will inquire? As stated earlier, users become guests with respect to a listing once they have had a reservation there, so we journey <code>through: :reservations</code>, and our new aliased association is complete!</p>
+
+<figure class='code'><figcaption><span>listing.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Listing</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>  <span class="n">belongs_to</span> <span class="ss">:neighborhood</span>
+</span><span class='line'>  <span class="n">belongs_to</span> <span class="ss">:host</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;User&quot;</span>  <span class="c1"># =&gt; AR gives us &#39;listing.host&#39; method</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reservations</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reviews</span><span class="p">,</span> <span class="ss">:through</span> <span class="o">=&gt;</span> <span class="ss">:reservations</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:guests</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="ss">:through</span> <span class="o">=&gt;</span> <span class="ss">:reservations</span>
+</span><span class='line'>    <span class="c1"># =&gt; AR gives us &#39;listing.guests&#39; method</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So this was useful, and allowed me to give some depth to the nature of relationships between a user and other models. Eventually, after passing a host of other tests, I arrived at my final 3 tests: model tests for <code>user.rb</code>:</p>
+
+<figure class='code'><figcaption><span>user_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">it</span> <span class="s1">&#39;as a host, knows about the guests its had&#39;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">expect</span><span class="p">(</span><span class="vi">@amanda</span><span class="o">.</span><span class="n">guests</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="kp">include</span><span class="p">(</span><span class="vi">@logan</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">it</span> <span class="s1">&#39;as a guest, knows about the hosts its had&#39;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">expect</span><span class="p">(</span><span class="vi">@logan</span><span class="o">.</span><span class="n">hosts</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="kp">include</span><span class="p">(</span><span class="vi">@amanda</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">it</span> <span class="s1">&#39;as a host, knows about its reviews from guests&#39;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">expect</span><span class="p">(</span><span class="vi">@amanda</span><span class="o">.</span><span class="n">host_reviews</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="kp">include</span><span class="p">(</span><span class="vi">@review1</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At this point, my user model had the following associations:</p>
+
+<figure class='code'><figcaption><span>user.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">#host methods</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:listings</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;host_id&#39;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reservations</span><span class="p">,</span> <span class="ss">:through</span> <span class="o">=&gt;</span> <span class="ss">:listings</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">#guest methods</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:trips</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;Reservation&quot;</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;guest_id&#39;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reviews</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;guest_id&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>First test first: allow a User, as a host, to know about the guests it&rsquo;s had. Ultimately this means we want to be able to call <code>.guests</code> on a user, and have it return all the other users who have ever stayed with the host-user. What does this look like, as far as the database and associations are concerned? Turns out, not super complicated.</p>
+
+<figure class='code'><figcaption><span>user.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">#host methods</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:listings</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;host_id&#39;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reservations</span><span class="p">,</span> <span class="ss">:through</span> <span class="o">=&gt;</span> <span class="ss">:listings</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:guests</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:reservations</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;guest_id&#39;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">#guest methods</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:trips</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;Reservation&quot;</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;guest_id&#39;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reviews</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;guest_id&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Because we can call <code>.reservations</code> on a host-user to return the set of reservations that have occurred at their listing(s), we simply make another jump through reservations to <code>:guests</code>, and state that the computer should regard &ldquo;guests&rdquo; as users whose guest_ids are associated with the set of reservations associated with the host_id of the user in question. Verbose, but simple enough.</p>
+
+<p>The next 2 tests were trickier, though. In order to allow users as guests to know about hosts they&rsquo;ve had, and to allow host-users to know about reviews that have been written about them, I realized I needed to cast each model in the app &ndash; listings, reviews, &amp; reservations &ndash; from two different perspectives &ndash; <strong>one with respect to guests, and one with respect to hosts.</strong> This would, for example, allow a host-user to know that when <code>.reservations</code> is called on it, I want the set of reservations that have been booked by other users at their listing(s), whereas if <code>.reservations</code> were called on a guest-user, I would want to see all reservations they&rsquo;ve ever booked.</p>
+
+<p>Presumably I could not refer to both of these things as <code>.reservations</code>, given the very different sets of data I would expect them to return. Past that though, I had little idea of what to do &ndash; but thank goodness for informative error messages! One from ActiveRecord suggested that I try using something called <code>:source</code>, and so I tried. I did everything it suggested, and then just fiddled around and searched pretty much in vein for an accessible account of what was going on, or what I was even trying to accomplish with <code>:source</code>. Eventually, through sheer meddling, a very faraway sense of vague comprehension, and thinking that I wanted to employ some sort of double alias, I came up with the following:</p>
+
+<figure class='code'><figcaption><span>user.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">#host methods</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:listings</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;host_id&#39;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reservations</span><span class="p">,</span> <span class="ss">:through</span> <span class="o">=&gt;</span> <span class="ss">:listings</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:guests</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:reservations</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;guest_id&#39;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:host_reviews</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;Review&quot;</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:guests</span><span class="p">,</span> <span class="ss">source</span><span class="p">:</span> <span class="s2">&quot;reviews&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">#guest methods</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:trips</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;Reservation&quot;</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;guest_id&#39;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reviews</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;guest_id&#39;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:accommodations</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:trips</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;Listing&quot;</span><span class="p">,</span> <span class="ss">source</span><span class="p">:</span> <span class="s2">&quot;listing&quot;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:hosts</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:accommodations</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Establishing the associations above allowed me to pass all tests without writing any methods, which was super helpful and pretty interesting. I accepted that some ActiveRecord and/or Rails magic was going on, and moved onto the next. But I wanted to revisit the topic and figure out exactly what was going on. This is what I came up with:</p>
+
+<p>  <img src="http://ceguster.github.io/images/aliasing.jpg"></p>
+
+<p>Alright. So what&rsquo;s going on here? Turns out, <code>:source</code> adds another level of flexible context to a specific relationship between models in your app. While using <code>:class_name</code> allowed me to give User different contexts in which to regard other models that are associated with it, using <code>:source</code> enabled me to cast both User and another model in more than one context overall, and in one particular context with relation to one another.</p>
+
+<p>First off, this:</p>
+
+<figure class='code'><figcaption><span>user.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">has_many</span> <span class="ss">:host_reviews</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;Review&quot;</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:guests</span><span class="p">,</span> <span class="ss">source</span><span class="p">:</span> <span class="s2">&quot;reviews&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This association allows a user, when considered as a host, to know about all reviews that have been written about him/her. I start by asking for what I want: for a host to <code>has_many :host_reviews</code>. First, I employ <code>:class_name</code> so the computer knows that &ldquo;host_reviews&rdquo; is just another way of asking for a set of objects from the Review class. And when I whiteboarded it out, I realized that I was really asking for all of the sets of reviews with guest_ids that corresponded with reservations that had occurred at listings with host_ids that match the id of the host-user. And because I ultimately wanted to ask each of those guests, who had been guests of a particular host, for their reviews, I conclude the association by telling ActiveRecord the source of said information: &ldquo;reviews&rdquo;, with respect to each of the aformentioned guests.</p>
+
+<p>Follow me so far? It&rsquo;s about to get weirder. Let&rsquo;s look at the guest methods:</p>
+
+<figure class='code'><figcaption><span>user.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="c1">#guest methods</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:trips</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;Reservation&quot;</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;guest_id&#39;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:reviews</span><span class="p">,</span> <span class="ss">:foreign_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;guest_id&#39;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:accommodations</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:trips</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;Listing&quot;</span><span class="p">,</span> <span class="ss">source</span><span class="p">:</span> <span class="s2">&quot;listing&quot;</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:hosts</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:accommodations</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here, I had already recontextualized reservations with respect to guests as &ldquo;trips&rdquo;, on line 2. I then give another alias to &ldquo;Listing&rdquo;, to allow guests to know about the properties at which they&rsquo;ve stayed. These I refer to as <code>:accommodations</code>, and make the leap to a guest having_many of them through their trips. Not so crazy. After this, I use <code>:class_name =&gt; "Listing"</code> to let ActiveRecord know that &ldquo;accommodations&rdquo; is another name for a Listing, but I still need to tell it about the context in which a Listing is regarded as an accommodation to a guest-user.</p>
+
+<p>My first instinct was to use <code>source: "listings"</code>, since naming &ldquo;reviews&rdquo; as a source had worked before. This did not solve my problem, and through blind guessing I had arrived at the use of &ldquo;listing&rdquo;
+instead of &ldquo;listings.&rdquo; But only by writing it out did I figure out what was happening.</p>
+
+<figure class='code'><figcaption><span>user.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">has_many</span> <span class="ss">:accommodations</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:trips</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;Listing&quot;</span><span class="p">,</span> <span class="ss">source</span><span class="p">:</span> <span class="s2">&quot;listing&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To call <code>.accommodations</code> on a user will first find the set of reservation objects for which that user&rsquo;s id is the guest_id, which will in turn expose the listing_id associated with each of those reservations. And from that batch of relevant listing ids, do we want to ask for &ldquo;listings&rdquo;? No &ndash; we want a single &ldquo;listing&rdquo; that possesses that listing_id &ndash; therefore, we name the <code>source:</code> as &ldquo;listing&rdquo;, instead of &ldquo;listings.&rdquo;</p>
+
+<p>Phew. If you&rsquo;re still following, I salute you. One more to go!</p>
+
+<p>Last but not least, I used the fact that I had allowed reservations and listings to exist in dual-contexts to allow guests to know about their hosts.</p>
+
+<figure class='code'><figcaption><span>user.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">has_many</span> <span class="ss">:hosts</span><span class="p">,</span> <span class="ss">:class_name</span> <span class="o">=&gt;</span> <span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:accommodations</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At this point, this seems simple: I state what I want, for a user as guest to <code>has_many :hosts</code>, which is just another perspective on <code>:class_name =&gt; "User"</code>, and I will get that information through <code>:accommodations</code>. Why accommodations? Basically here, I&rsquo;m asking for the listings (accommodations) at which there have been reservations where the guest_id is equal to the id of the user in question, and from there, I ask for the set of host_ids associated with each of those listings (accommodations), and for the users whose ids are equal to those host_ids.</p>
+
+<p>Whoa. Clearly this could all be written out as complex SQL with a bunch of joins and whatnot, but the major takeaways for me are this:</p>
+
+<ul>
+<li><p>  Whiteboarding is super helpful for figuring out associations in your app;</p></li>
+<li><p>  Using &ldquo;source&rdquo; and &ldquo;class_name&rdquo; can be very useful for giving nuanced relationships to your models in particular contexts within your domain; and,</p></li>
+<li><p>  Aliasing is not about simply dubbing a User &ldquo;host&rdquo; or &ldquo;guest,&rdquo; and in fact, without any contextualizing relationship, to call a user a host or guest is devoid of meaning.</p></li>
+</ul>
+
+
+<p>Relationships matter. Pass it on.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[These Ties That Bind]]></title>
-    <link href="http://ceguster.github.io/blog/2014/10/22/working-title-binding/"/>
+    <link href="http://ceguster.github.io/blog/2014/10/22/these-ties-that-bind/"/>
     <updated>2014-10-22T23:55:12-04:00</updated>
-    <id>http://ceguster.github.io/blog/2014/10/22/working-title-binding</id>
+    <id>http://ceguster.github.io/blog/2014/10/22/these-ties-that-bind</id>
     <content type="html"><![CDATA[<p>When we were first learning to debug our code, we budding young Rubyists were given a great tool: Pry. This gem serves both as a console (comparable or perhaps superior to IRB), and as a user-friendly, rather intuitive debugger. All you must do to use it is require the gem, and type <code>binding.pry</code> into the line or lines of your program where you&rsquo;d like to stop and look around. Or, put <a href="http://pryrepl.org/">more technically</a>, Pry allows you to explore the run-time view of a program by making all program state at that point available.</p>
 
 <p>Cool, right? Right! This is exactly what I as a newcomer to the craft want to be able to do: drop into my program in the middle of its execution, and figure out what it is doing by asking it about the values of variables, etc. After learning about bindings, which I assumed to be the the brainchild of the makers of Pry, I felt overwhelming gratitude toward them&hellip;and then continued working on some lab or other, I&rsquo;m sure.</p>
@@ -73,7 +317,7 @@
 
 <p>This construct allowed me to do something in my code that feels very linguistically natural in English: I could say &ldquo;the first 3 numbers&rdquo;, &ldquo;the next 3 numbers&rdquo;, and &ldquo;the next 4 numbers&rdquo; to a computer and be understood. Awesome.</p>
 
-<p><strong>Another lesson in programming that regexes reminded me of is: don&rsquo;t over-program.</strong> I was reminded of this during a lab entitled &ldquo;Regex Rally,&rdquo; in which we had to write the correct regular expression directly into the spec file to make the tests pass. By looking at the third test, which was asking for a regex that matches a valid email address. Working with <a href="http://www.rubular.com">Rubular</a>, I built an expression that matched standard email addresses (name@domain.***), but ran into trouble with emails where the @ was preceded by a string that contained periods, or where the domain was, for example, &ldquo;@co.uk,&rdquo; instead of &ldquo;.com.&rdquo; I found an expression that allowed those variations&hellip;but it failed to weed out unacceptable inputs, like &ldquo;name@<a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#x65;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#x2e;&#x63;&#x6f;&#109;&#64;&#101;&#120;&#97;&#x6d;&#112;&#x6c;&#101;&#46;&#99;&#111;&#109;&#x2e;">&#x65;&#x78;&#x61;&#x6d;&#112;&#108;&#101;&#46;&#99;&#111;&#109;&#x40;&#x65;&#120;&#97;&#109;&#x70;&#108;&#101;&#x2e;&#x63;&#111;&#x6d;&#x2e;</a>&rdquo;</p>
+<p><strong>Another lesson in programming that regexes reminded me of is: don&rsquo;t over-program.</strong> I was reminded of this during a lab entitled &ldquo;Regex Rally,&rdquo; in which we had to write the correct regular expression directly into the spec file to make the tests pass. By looking at the third test, which was asking for a regex that matches a valid email address. Working with <a href="http://www.rubular.com">Rubular</a>, I built an expression that matched standard email addresses (name@domain.***), but ran into trouble with emails where the @ was preceded by a string that contained periods, or where the domain was, for example, &ldquo;@co.uk,&rdquo; instead of &ldquo;.com.&rdquo; I found an expression that allowed those variations&hellip;but it failed to weed out unacceptable inputs, like &ldquo;name@<a href="&#x6d;&#97;&#x69;&#108;&#116;&#x6f;&#x3a;&#x65;&#120;&#x61;&#x6d;&#x70;&#108;&#101;&#x2e;&#99;&#x6f;&#109;&#64;&#x65;&#x78;&#x61;&#x6d;&#112;&#108;&#101;&#46;&#99;&#x6f;&#x6d;&#46;">&#101;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#x2e;&#x63;&#x6f;&#x6d;&#64;&#x65;&#x78;&#x61;&#x6d;&#112;&#108;&#x65;&#46;&#x63;&#111;&#x6d;&#46;</a>&rdquo;</p>
 
 <p>I worked on Rubular for a little while, but was having trouble weeding out all the edge cases (and beginning to feel a little crazy). Then I realized &ndash; I was writing a regular expression to allow certain characters in a certain relational order, but what I really needed was a regex that <em>disallowed</em> the undesirables. I came up with the following.</p>
 
